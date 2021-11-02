@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using VueCliMiddleware;
 
 namespace GribBoard
@@ -15,6 +17,11 @@ namespace GribBoard
         {
             services.AddSpaStaticFiles(opt => opt.RootPath = "gribboard-client/dist");
             services.AddControllers();
+            services.AddSignalR()
+                .AddNewtonsoftJsonProtocol(options =>
+                {
+                    options.PayloadSerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), true));
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +46,7 @@ namespace GribBoard
                     regex: "Compiled successfully",
                     forceKill: true
                     );
+                endpoints.MapHub<GribboardHub>("gribboardHub");
             });
         }
     }
