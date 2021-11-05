@@ -1,4 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+import GribboardHub from './gribboard-hub'
+
+const app = createApp(App);
+
+app.use(GribboardHub)
+app.mount('#app')

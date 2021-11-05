@@ -35,7 +35,12 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
-  }
+  },
+  created() {
+    this.$gribboardHub.on("ClientAdded", function (id) {
+      alert("other alert hello: " + id);
+    })
+  },
 }
 </script>
 
