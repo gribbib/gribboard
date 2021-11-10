@@ -2,15 +2,18 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <h1 v-if="test">Me - {{ test }}</h1>
-    <ul id="array-rendering">
-      <li v-for="(item, index) in items">{{ index }} - {{ item.message }}</li>
-    </ul>
+    <Client v-for="(item, index) in items" :name="item.message" />
   </div>
 </template>
 
 <script>
+import Client from './Client.vue'
+
 export default {
-  name: "GribBoard",
+  name: 'GribBoard',
+  components: {
+    Client
+  },
   props: {
     msg: String,
   },
