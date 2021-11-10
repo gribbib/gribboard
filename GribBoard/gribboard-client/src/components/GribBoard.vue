@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <h1 v-if="test">Me - {{ test }}</h1>
-    <Client v-for="(item, index) in items" :name="item.message" />
+    <Client :clientId="myId" :self="true" :links="mySharedLinks"/>
+    <Client v-for="(item, index) in clients" :clientId="item.message" :self="false" v-bind:key="index"/>
   </div>
 </template>
 
@@ -19,25 +19,30 @@ export default {
   },
   data() {
     return {
-      test: "",
-      items: [],
+      myId: "",
+      clients: [],
+      mySharedLinks: []
     };
   },
   created() {
     this.$gribboardHub.on("ClientAdded", this.AddClient);
     this.$gribboardHub.on("MeAdded", this.AddMe);
+    this.$gribboardHub.on("GribboardEntryAdded", this.AddGribboardEntry);
   },
   methods: {
     AddClient(id) {
-      this.items.push({ message: id });
+      this.clients.push({ message: id });
     },
     AddMe(id, otherIds) {
-      this.test = id;
+      this.myId = id;
       otherIds.forEach((otherId) => {
         if (otherId != id) {
           this.AddClient(otherId);
         }
       });
+    },
+    AddGribboardEntry(link, autoOpen, fromId) {
+      mySharedLinks.push(link)
     },
   },
 };
