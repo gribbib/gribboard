@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
@@ -7,13 +8,20 @@ namespace GribBoard
 {
     internal class GribboardHub : Hub<IGribboardClient>
     {
-        private Dictionary<string, string> clients = new Dictionary<string, string>();
+        private readonly GribHubRepository _repository;
+
+        public GribboardHub(GribHubRepository repository)
+        {
+            _repository = repository;
+        }
 
         public override async Task OnConnectedAsync()
         {
-            var id = "id";
-            clients[id] = Context.ConnectionId;
-            await Clients.All.ClientAdded(id);
+            var rand = new Random();
+            var id = rand.Next().ToString();
+            _repository.Clients[id] = Context.ConnectionId;
+            await Clients.Others.ClientAdded(id);
+            await Clients.Caller.MeAdded(id, _repository.Clients.Select(k => k.Key));
             await base.OnConnectedAsync();
         }
 
@@ -26,7 +34,7 @@ namespace GribBoard
             }
             else
             {
-                await Clients.Client(clients[targetId]).GribboardEntryAdded(text, autoOpen);
+                await Clients.Client(_repository.Clients[targetId]).GribboardEntryAdded(text, autoOpen);
             }
         }
 
@@ -34,7 +42,7 @@ namespace GribBoard
         {
             var removedId = string.Empty;
             // find and remove client entry
-            foreach (var client in clients)
+            foreach (var client in _repository.Clients)
             {
                 if (client.Value == Context.ConnectionId)
                 {
@@ -47,7 +55,7 @@ namespace GribBoard
                 return;
             }
 
-            clients.Remove(removedId);
+            _repository.Clients.Remove(removedId);
 
             await Clients.All.ClientRemoved(removedId);
 

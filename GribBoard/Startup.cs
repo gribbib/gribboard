@@ -22,6 +22,7 @@ namespace GribBoard
                 {
                     options.PayloadSerializerSettings.Converters.Add(new StringEnumConverter(new CamelCaseNamingStrategy(), true));
                 });
+            services.AddSingleton<GribHubRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
