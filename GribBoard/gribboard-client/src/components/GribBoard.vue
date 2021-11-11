@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <Client :clientId="myId" :self="true" :links="mySharedLinks"/>
+    <Client :clientId="myId" :self="true" />
     <Client v-for="(item, index) in clients" :clientId="item.message" :self="false" v-bind:key="index"/>
   </div>
 </template>
@@ -21,13 +21,11 @@ export default {
     return {
       myId: "",
       clients: [],
-      mySharedLinks: []
     };
   },
   created() {
     this.$gribboardHub.on("ClientAdded", this.AddClient);
     this.$gribboardHub.on("MeAdded", this.AddMe);
-    this.$gribboardHub.on("GribboardEntryAdded", this.AddGribboardEntry);
   },
   methods: {
     AddClient(id) {
@@ -40,9 +38,6 @@ export default {
           this.AddClient(otherId);
         }
       });
-    },
-    AddGribboardEntry(link, autoOpen, fromId) {
-      mySharedLinks.push(link)
     },
   },
 };

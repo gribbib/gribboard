@@ -5,7 +5,7 @@
     <p>{{ self ? "Shared with me" : "Share with " + clientId }}:</p>
     <div class="share-link" v-bind:class="{ self: self, other: !self }">
       <input type="text" v-model="shareLink" />
-      <input type="submit" v-on:click="test()" value="send" />
+      <input type="submit" v-on:click="invokeAddGribboardEntry()" value="send" />
     </div>
     <ul>
       <li v-for="(link, index) in links" v-bind:key="index">{{ link }}</li>
@@ -19,18 +19,30 @@ export default {
   props: {
     clientId: String,
     self: Boolean,
-    links: [String],
   },
   data() {
     return {
-      //   links: ["dfsf"],
+      links: [],
       shareLink: "",
     };
   },
-  created() {},
+  created() {
+    this.$gribboardHub.on("GribboardEntryAdded", this.AddGribboardEntry);
+  },
   methods: {
-    test() {
-        alert("test")
+    invokeAddGribboardEntry() {
+      this.links.push(this.shareLink);
+      this.$gribboardHub.invoke(
+        "AddGribboardEntry",
+        this.shareLink,
+        this.clientId,
+        false
+      );
+    },
+    AddGribboardEntry(link, autoOpen, fromId) {
+      if (this.self) {
+        this.links.push(link);
+      }
     },
   },
 };
