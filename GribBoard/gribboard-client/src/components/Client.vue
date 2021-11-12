@@ -4,7 +4,7 @@
     <input id="test" type="text" v-model="clientId" v-bind:disabled="!self" />
     <p>{{ self ? "Shared with me" : "Share with " + clientId }}:</p>
     <div class="share-link" v-bind:class="{ self: self, other: !self }">
-      <input type="text" v-model="shareLink" />
+      <input type="text" v-model="shareLink" v-on:change="invokeAddGribboardEntry()"/>
       <input type="submit" v-on:click="invokeAddGribboardEntry()" value="send" />
     </div>
     <ul>
@@ -38,6 +38,7 @@ export default {
         this.clientId,
         false
       );
+      this.shareLink = "";
     },
     AddGribboardEntry(link, autoOpen, fromId) {
       if (this.self) {
