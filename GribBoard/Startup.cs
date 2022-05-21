@@ -34,6 +34,7 @@ namespace GribBoard
             }
 
             app.UseSpaStaticFiles();
+            // app.UseSpa(spa => {spa.Options.SourcePath = "gribbib-client"; });
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

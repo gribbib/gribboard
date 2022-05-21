@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <!-- <DistFiles Include="$(SpaRoot)dist\**" /> -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,5 +10,17 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.11" />
     <PackageReference Include="VueCliMiddleware" Version="5.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- <ContentWithTargetPath Include="gribboard-client\src\**\*.*" Exclude="package.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+       <TargetPath>gribboard-client</TargetPath>
+    </ContentWithTargetPath> -->
+
+    <Content Include="gribboard-client\**\*.*" Exclude="gribboard-client\package*.json" >
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+</ItemGroup>
+
 
 </Project>
