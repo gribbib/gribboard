@@ -1,42 +1,45 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
-WORKDIR /app
+# build .NET app:
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine as buildnet
 
-# Copy csproj and restore as distinct layers
+WORKDIR /src
+
+COPY GribBoard.csproj .
+RUN dotnet restore
+
 COPY . .
-RUN dotnet restore GribBoard.csproj
+RUN dotnet build -c Release
+
+# RUN dotnet test ...
+
+RUN dotnet publish -c Release -o /dist
 
 
+# build Vue app:
+FROM node:16.13.0 as buildvue
 
-# Required libraries in Unix
-RUN apt-get update -q && apt-get install -q -y \
-        curl apt-transport-https apt-utils dialog \
-        make g++ build-essential
+WORKDIR /src
 
-# Node Bash Script for Debian
-# https://github.com/nodesource/distributions#deb
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-
-# Propagate Node for Docker
-RUN apt-get update \
-    && apt-get install -y nodejs
-
-
-# Copy everything else and build
-# COPY / ./
-RUN dotnet publish -c Release -o out
-
-#npm install in gribbib-client
-# FROM node:16.13.0 as buildvue
-# WORKDIR /app
-# COPY --from=build-env /app/out .
-WORKDIR /app/out/gribboard-client
+COPY gribboard-client/package.json .
 RUN npm install
 
-# Build runtime image
-# FROM mcr.microsoft.com/dotnet/aspnet:5.0
-WORKDIR /app/out
+# webpack build
+COPY gribboard-client .
+RUN npm run build
+
+
+# Copy results from both places into production container:
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
+
+WORKDIR /app
+
 ENV ASPNETCORE_ENVIRONMENT Production
 ENV ASPNETCORE_URLS http://+:5000
 EXPOSE 5000
-# COPY --from=build-env /app .
-ENTRYPOINT ["dotnet", "GribBoard.dll"]
+
+# copy .net content
+COPY --from=buildnet /dist .
+# copy vue content into .net's static files folder:
+COPY --from=buildvue ./src/wwwroot/dist /app/wwwroot
+RUN ls -ls /app/wwwroot
+
+CMD ["dotnet", "GribBoard.dll"]

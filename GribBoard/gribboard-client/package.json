@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@aspnet/signalr": "^1.0.27",
+    "@latelier/vue-signalr": "^2.0.4",
+    "babel-runtime": "^6.26.0",
     "core-js": "^3.19.0",
     "vue": "^3.2.20",
     "vue-loader-v16": "^16.0.0-beta.5.4"

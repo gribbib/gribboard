@@ -26,6 +26,7 @@ export default {
   created() {
     this.$gribboardHub.on("ClientAdded", this.AddClient);
     this.$gribboardHub.on("MeAdded", this.AddMe);
+    this.$gribboardHub.on("ClientRemoved", this.RemoveClient);
   },
   methods: {
     AddClient(id) {
@@ -38,6 +39,9 @@ export default {
           this.AddClient(otherId);
         }
       });
+    },
+    RemoveClient(id) {
+      this.clients.remove({ message: id });
     },
   },
 };
